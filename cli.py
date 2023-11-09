@@ -1182,7 +1182,7 @@ def handle_case_filter(cli_computer):
     handle_case_filter_answers = inquirer.prompt(handle_case_filter_qusetion)
     new_valid_list = valid_list
     if len(handle_case_filter_answers["case_filter"]) == 0:
-        new_valid_list = [case.name for case in valid_list]
+        new_valid_list_name = [case.name for case in valid_list]
     else:
         for filter in handle_case_filter_answers["case_filter"]:
             if filter == "Type":
@@ -1199,7 +1199,7 @@ def handle_case_filter(cli_computer):
                     )
                 ]
                 handle_type_filter_answers = inquirer.prompt(handle_type_filter_qusetion)
-                new_valid_list = [case.name for case in new_valid_list if case.type in handle_type_filter_answers["type_filter"]]
+                new_valid_list = [case for case in new_valid_list if case.type in handle_type_filter_answers["type_filter"]]
             elif filter == "Color":
                 handle_color_filter_qusetion = [
                     inquirer.Checkbox(
@@ -1213,7 +1213,7 @@ def handle_case_filter(cli_computer):
                     )
                 ]
                 handle_color_filter_answers = inquirer.prompt(handle_color_filter_qusetion)
-                new_valid_list = [case.name for case in new_valid_list if case.color in handle_color_filter_answers["color_filter"]]
+                new_valid_list = [case for case in new_valid_list if case.color in handle_color_filter_answers["color_filter"]]
             elif filter == "Largest Motherboard Form Factor":
                 handle_mff_filter_qusetion = [
                     inquirer.List(
@@ -1229,7 +1229,7 @@ def handle_case_filter(cli_computer):
                 handle_mff_filter_answers = inquirer.prompt(handle_mff_filter_qusetion)
                 form_factor_hierarchy = ['Mini ITX', 'Micro ATX', 'ATX']
                 filtered_ffs = form_factor_hierarchy[form_factor_hierarchy.index(handle_mff_filter_answers["mff_filter"]):]
-                new_valid_list = [case.name for case in new_valid_list if case.l_motherboard_ff in filtered_ffs]
+                new_valid_list = [case for case in new_valid_list if case.l_motherboard_ff in filtered_ffs]
             elif filter == "Largest Power Supply Form Factor":
                 handle_psff_filter_qusetion = [
                     inquirer.List(
@@ -1244,7 +1244,7 @@ def handle_case_filter(cli_computer):
                 handle_psff_filter_answers = inquirer.prompt(handle_psff_filter_qusetion)
                 form_factor_hierarchy = ['SFX', 'ATX']
                 filtered_ffs = form_factor_hierarchy[form_factor_hierarchy.index(handle_psff_filter_answers["psff_filter"]):]
-                new_valid_list = [case.name for case in new_valid_list if case.l_ps_ff in filtered_ffs]
+                new_valid_list = [case for case in new_valid_list if case.l_ps_ff in filtered_ffs]
             elif filter == "Price":
                 while True:
                     try:
@@ -1260,16 +1260,17 @@ def handle_case_filter(cli_computer):
                             print("The minimum price cannot be greater than the maximum price. Please enter valid values.")
                             continue
 
-                        new_valid_list = [case.name for case in new_valid_list if price_floor < case.price < price_ceiling]
+                        new_valid_list = [case for case in new_valid_list if price_floor < case.price < price_ceiling]
                         break
                     except ValueError:
                         print("Please enter a valid integer for price.")
             elif filter == f"{RED}CLEAR FILTERS":
-                new_valid_list = [case.name for case in valid_list]
+                new_valid_list = [case for case in valid_list]
             else:
-                new_valid_list = [case.name for case in valid_list]
+                new_valid_list = [case for case in valid_list]
+    new_valid_list_name = [case.name for case in new_valid_list]
     os.system("clear")
-    add_part_case_cli(cli_computer, new_valid_list)
+    add_part_case_cli(cli_computer, new_valid_list_name)
     
 
 
