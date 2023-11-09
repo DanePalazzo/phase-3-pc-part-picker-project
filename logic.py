@@ -3,15 +3,37 @@ from data import *
 def create_computer(name):
     if isinstance(name, str):
         with Session(engine) as session:
-            n_computer = Computer(name=f"{name}")
-            session.add(n_computer)
-            session.commit()
-            return n_computer
+            existing_computer_name = session.query(Computer).filter_by(name=name).first()
+            if not existing_computer_name:
+                n_computer = Computer(name=f"{name}")
+                session.add(n_computer)
+                session.commit()
+                return n_computer
+            else:
+                raise Exception("Name already exists")
     else:
-        raise Exception("Name must be a string")
+        raise TypeError("Name must be a string")
 
-with Session(engine) as session:
-    n_cpu = session.query(CPU).filter_by(id=55).first()
+def remove_computer(computer_id):
+    if isinstance(computer_id, int):
+        with Session(engine) as session:
+            r_computer = session.query(Computer).filter_by(id=computer_id).first()
+            if isinstance(r_computer, Computer):
+                session.delete(r_computer)
+                session.commit()
+                print(f"Computer named '{r_computer.name}' has been deleted.")
+                return True
+            else:
+                raise ValueError(f"No computer found with the id '{computer_id}'")
+    else:
+        raise TypeError("Computer ID must be an integer")
+    
+def find_computer_by_name(computer_name):
+    if isinstance(computer_name, str):
+        with Session(engine) as session:
+            computer = session.query(Computer).filter_by(name=computer_name).first()
+            return computer
+
 
 def find_part(part_attr, f_id):
     attr_to_class = {
@@ -27,9 +49,26 @@ def find_part(part_attr, f_id):
     f_class = attr_to_class[part_attr]
     if f_class is None:
         raise ValueError(f"Unknown part type: {part_attr}")
-    
     with Session(engine) as session:
         f_part = session.query(f_class).filter_by(id=f_id).first()
+        return f_part
+    
+def find_part_by_name(part_attr, f_name):
+    attr_to_class = {
+        'cpu': CPU,
+        'gpu': GPU,
+        'motherboard': Motherboard,
+        'ram': RAM,
+        'storage': Storage,
+        'cpu_cooler': CPU_Cooler,
+        'power_supply': Power_Supply,
+        'case': Case
+    }
+    f_class = attr_to_class[part_attr]
+    if f_class is None:
+        raise ValueError(f"Unknown part type: {part_attr}")
+    with Session(engine) as session:
+        f_part = session.query(f_class).filter_by(name=f_name).first()
         return f_part
 
 def current_computer(c_id):
@@ -57,7 +96,8 @@ def validate_part(c_computer, c_part):
         Power_Supply: (valid_power_supply),
         Case: (valid_case),
         GPU: (valid_gpu),
-        CPU_Cooler: (valid_cpu_cooler)
+        CPU_Cooler: (valid_cpu_cooler),
+        Storage: (valid_storage)
     }
 
     validate_function = part_validation_map.get(type(c_part), None)
@@ -162,6 +202,12 @@ def valid_cpu_cooler(c_id):
         valid_cpu_cooler_list = session.query(CPU_Cooler)
         return valid_cpu_cooler_list.all()
 
+def valid_storage(c_id):
+    with Session(engine) as session:
+        c_computer = session.query(Computer).filter_by(id=c_id).first()
+        valid_storage_list = session.query(Storage)
+        return valid_storage_list.all()
+
 # add_to_computer(2, "motherboard", 340)
 # add_to_computer(2, "power_supply", 35)
 # print(len(valid_cases(2)))
@@ -173,10 +219,17 @@ def valid_cpu_cooler(c_id):
 # print(len(valid_power_supply(3)))
 
 # create_computer("5")
-add_to_computer(5, "cpu", 100)
+# add_to_computer(5, "cpu", 100)
 # add_to_computer(5, "ram", 256)
 # print([motherboard.id for motherboard in valid_motherboard(4)])
 # print(len(valid_motherboard(5)))
 # remove_from_computer(5, "motherboard")
 # add_to_computer(5, "motherboard", 251)
-add_to_computer(5, "ram", 1)
+# add_to_computer(5, "ram", 1)
+
+
+# create_computer("Rory's Computer")
+# add_to_computer(7, "cpu", 10)
+# add_to_computer(7, "motherboard", 254)
+# print([motherboard.id for motherboard in valid_motherboard(7)])
+# remove_from_computer(7, "motherboard")

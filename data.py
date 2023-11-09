@@ -55,7 +55,7 @@ class Computer(Base):
             session.add(self)
             setattr(self, part_attr, None)
             session.commit()
-    
+
 class CPU(Base):
     __tablename__ = "cpus"
     id = Column(Integer, primary_key=True)
@@ -70,6 +70,21 @@ class CPU(Base):
     price = Column(Float)
     computers = relationship("Computer", back_populates="cpu")
 
+    def display_details(self):
+        display_details = {
+            "id": self.id,
+            "name": self.name,
+            "core_count": self.core_count,
+            "performance_clock": self.performance_clock,
+            "performance_boost_clock": self.performance_boost_clock,
+            "tdp": self.tdp,
+            "integrated_graphics": self.integrated_graphics,
+            "smt": self.smt,
+            "socket": self.socket,
+            "price": self.price
+        }
+        return display_details
+
 class GPU(Base):
     __tablename__ = "gpus"
     id = Column(Integer, primary_key=True)
@@ -83,6 +98,20 @@ class GPU(Base):
     price = Column(Float)
     computers = relationship("Computer", back_populates="gpu")
 
+    def display_details(self):
+        display_details = {
+            "id": self.id,
+            "name": self.name,
+            "chipset": self.chipset,
+            "memory": self.memory,
+            "core_clock": self.core_clock,
+            "boost_clock": self.boost_clock,
+            "length": self.length,
+            "tdp": self.tdp,
+            "price": self.price
+        }
+        return display_details
+
 class Motherboard(Base):
     __tablename__ = "motherboards"
     id = Column(Integer, primary_key=True)
@@ -95,6 +124,19 @@ class Motherboard(Base):
     price = Column(Float)
     computers = relationship("Computer", back_populates="motherboard")
 
+    def display_details(self):
+        display_details = {
+        "id": self.id,
+        "name": self.name,
+        "socket": self.socket,
+        "form_factor": self.form_factor,
+        "memory_max": self.memory_max,
+        "memory_slots": self.memory_slots,
+        "ddr": self.ddr,
+        "price": self.price
+        }
+        return display_details
+
 class RAM(Base):
     __tablename__ = "rams"
     id = Column(Integer, primary_key=True)
@@ -106,6 +148,18 @@ class RAM(Base):
     price = Column(Float)
     computers = relationship("Computer", back_populates="ram")
 
+    def display_details(self):
+        display_details = {
+        "id": self.id,
+        "name": self.name,
+        "speed": self.speed,
+        "modules": self.modules,
+        "price_per_gb": self.price,
+        "ddr": self.ddr,
+        "price": self.price
+        }
+        return display_details
+    
 class Storage(Base):
     __tablename__ = "storages"
     id = Column(Integer, primary_key=True)
@@ -119,6 +173,20 @@ class Storage(Base):
     price = Column(Float)
     computers = relationship("Computer", back_populates="storage")
 
+    def display_details(self):
+        display_details = {
+        "id": self.id,
+        "name": self.name,
+        "capacity": self.capacity,
+        "price_per_gb": self.price_per_gb,
+        "type": self.type,
+        "cache": self.cache,
+        "form_factor": self.form_factor,
+        "interface": self.interface,
+        "price": self.price,
+        }
+        return display_details
+
 class CPU_Cooler(Base):
     __tablename__ = "cpu_coolers"
     id = Column(Integer, primary_key=True)
@@ -128,6 +196,17 @@ class CPU_Cooler(Base):
     radiator_size = Column(Integer)
     price = Column(Float)
     computers = relationship("Computer", back_populates="cpu_cooler")
+
+    def display_details(self):
+        display_details = {
+        "id": self.id,
+        "name": self.name,
+        "fan_rpm": self.fan_rpm,
+        "noise_level": self.noise_level,
+        "radiator_size": self.radiator_size,
+        "price": self.price
+        }
+        return display_details
 
 class Power_Supply(Base):
     __tablename__ = "power_supplys"
@@ -140,6 +219,18 @@ class Power_Supply(Base):
     price = Column(Float)
     computers = relationship("Computer", back_populates="power_supply")
 
+    def display_details(self):
+        display_details = {
+        "id": self.id,
+        "name": self.name,
+        "ps_type": self.ps_type,
+        "efficiency_rating": self.efficiency_rating,
+        "wattage": self.wattage,
+        "modular": self.modular,
+        "price": self.price
+        }
+        return display_details
+
 class Case(Base):
     __tablename__ = "cases"
     id = Column(Integer, primary_key=True)
@@ -150,6 +241,18 @@ class Case(Base):
     l_ps_ff = Column(String)
     price = Column(Float)
     computers = relationship("Computer", back_populates="case")
+
+    def display_details(self):
+        display_details = {
+        "id": self.id,
+        "name": self.name,
+        "type": self.type,
+        "color": self.color,
+        "l_motherboard_ff": self.l_motherboard_ff,
+        "l_ps_ff": self.l_ps_ff,
+        "price": self.price
+        }
+        return display_details
 
 engine = create_engine('sqlite:///pc_part_picker.db')
 Base.metadata.create_all(engine)
