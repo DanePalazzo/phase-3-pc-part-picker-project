@@ -10,6 +10,7 @@ from inquirer.themes import GreenPassion
 RED = '\033[91m'
 GREEN = '\033[92m'
 YELLOW = '\033[93m'
+CYAN = '\033[96m'
 RESET = '\033[0m'
 
 def welcome_cli():
@@ -26,7 +27,7 @@ def main_menu_cli():
     mm_questions = [
         inquirer.List(
         "main_menu_selector",
-        message="Do you want to",
+        message="Select",
         choices=["Create New Computer", "View Existing Computers"],
         )
     ]
@@ -165,7 +166,7 @@ def view_computer_details_cli(cli_computer):
             else:
                 c_computer_part_names.append(part.name)
         c_computer_part_options = c_computer_part_names
-        c_computer_part_options.append(f"{YELLOW}RETRUN TO {cli_computer.name.upper()} OPTIONS")
+        c_computer_part_options.extend([f"{YELLOW}RETRUN TO {cli_computer.name.upper()} OPTIONS", f"{RED}REMOVE A PART?"])
         view_computer_details_questions = [
             inquirer.List(
             "part_selector",
@@ -180,6 +181,7 @@ def view_computer_details_cli(cli_computer):
                 f"6: Power Supply: {c_computer_part_options[6]}",
                 f"7: Case: {c_computer_part_options[7]}",
                 c_computer_part_options[8],
+                c_computer_part_options[9],
             ],
             )
         ]
@@ -187,6 +189,9 @@ def view_computer_details_cli(cli_computer):
         if view_computer_details_answers["part_selector"].endswith("OPTIONS"):
             os.system('clear')
             view_computer_options_cli(cli_computer)
+        elif view_computer_details_answers["part_selector"].endswith("PART?"):
+            os.system('clear')
+            remove_part_cli(cli_computer, c_computer_part_names)
         else:
             selected_part_index = int(view_computer_details_answers["part_selector"].split(": ")[0])
             selected_part_type = str(view_computer_details_answers["part_selector"].split(": ")[1])
@@ -221,7 +226,6 @@ def view_computer_details_cli(cli_computer):
                     elif selected_part_index is 7:
                         os.system('clear')
                         add_part_case_cli(cli_computer)             
-
             else:
                 selected_part = c_computer_parts[selected_part_index]
                 part_details = selected_part.display_details()
@@ -231,8 +235,97 @@ def view_computer_details_cli(cli_computer):
                     print(f"{part_type}: {part}")
                 view_computer_details_cli(cli_computer)
 
-def none_detail_cli():
-    pass
+def remove_part_cli(cli_computer, c_computer_part_names):
+    c_computer_part_options = c_computer_part_names
+    c_computer_part_options.append([f"{YELLOW}RETRUN TO {cli_computer.name.upper()} OPTIONS"])
+    while True:
+        view_computer_details_questions = [
+            inquirer.List(
+            "part_delete_selector",
+            message="SELECT THE PART YOU WOULD LIKE TO REMOVE",
+            choices=[
+                f"{RED}DELETE: 0: CPU: {c_computer_part_options[0]}",
+                f"{RED}DELETE: 1: GPU: {c_computer_part_options[1]}",
+                f"{RED}DELETE: 2: Motherboard: {c_computer_part_options[2]}",
+                f"{RED}DELETE: 3: RAM: {c_computer_part_options[3]}",
+                f"{RED}DELETE: 4: Storage: {c_computer_part_options[4]}",
+                f"{RED}DELETE: 5: CPU Cooler: {c_computer_part_options[5]}",
+                f"{RED}DELETE: 6: Power Supply: {c_computer_part_options[6]}",
+                f"{RED}DELETE: 7: Case: {c_computer_part_options[7]}",
+                c_computer_part_options[8],
+            ],
+            )
+        ]
+        view_computer_details_answers = inquirer.prompt(view_computer_details_questions)
+        if view_computer_details_answers["part_delete_selector"].endswith("OPTIONS"):
+                os.system('clear')
+                break
+        else:
+                selected_part_index = int(view_computer_details_answers["part_delete_selector"].split(": ")[1])
+                selected_part_type = str(view_computer_details_answers["part_delete_selector"].split(": ")[2])
+                if c_computer_part_names[selected_part_index] == None:
+                    os.system('clear')
+                    print(f"{CYAN}{cli_computer.name} doesn't contain a {selected_part_type}")
+                    continue
+                else:
+                    remove_part_questions = [
+                    inquirer.Confirm(name="remove_part_confirm", message=f"Are you sure you want to remove {c_computer_part_names[selected_part_index]} from {cli_computer.name}?")
+                    ]
+                    remove_part_answers = inquirer.prompt(remove_part_questions)
+                    if remove_part_answers["remove_part_confirm"]:
+                        if selected_part_index is 0:
+                            remove_from_computer(cli_computer.id, "cpu")
+                            click.echo(f'{c_computer_part_names[selected_part_index]} removed! Press any button to retrun to {cli_computer.name} options.')
+                            c = click.getchar()
+                            click.echo()
+                            break
+                        elif selected_part_index is 1:
+                            remove_from_computer(cli_computer.id, "gpu")
+                            click.echo(f'{c_computer_part_names[selected_part_index]} removed! Press any button to retrun to {cli_computer.name} options.')
+                            c = click.getchar()
+                            click.echo()
+                            break
+                        elif selected_part_index is 2:
+                            remove_from_computer(cli_computer.id, "motherboard")
+                            click.echo(f'{c_computer_part_names[selected_part_index]} removed! Press any button to retrun to {cli_computer.name} options.')
+                            c = click.getchar()
+                            click.echo()
+                            break
+                        elif selected_part_index is 3:
+                            remove_from_computer(cli_computer.id, "ram")
+                            click.echo(f'{c_computer_part_names[selected_part_index]} removed! Press any button to retrun to {cli_computer.name} options.')
+                            c = click.getchar()
+                            click.echo()
+                            break
+                        elif selected_part_index is 4:
+                            remove_from_computer(cli_computer.id, "storage")
+                            click.echo(f'{c_computer_part_names[selected_part_index]} removed! Press any button to retrun to {cli_computer.name} options.')
+                            c = click.getchar()
+                            click.echo()
+                            break
+                        elif selected_part_index is 5:
+                            remove_from_computer(cli_computer.id, "cpu_cooler")
+                            click.echo(f'{c_computer_part_names[selected_part_index]} removed! Press any button to retrun to {cli_computer.name} options.')
+                            c = click.getchar()
+                            click.echo()
+                            break
+                        elif selected_part_index is 6:
+                            remove_from_computer(cli_computer.id, "power_supply")
+                            click.echo(f'{c_computer_part_names[selected_part_index]} removed! Press any button to retrun to {cli_computer.name} options.')
+                            c = click.getchar()
+                            click.echo()
+                            break
+                        elif selected_part_index is 7:
+                            remove_from_computer(cli_computer.id, "case")
+                            click.echo(f'{c_computer_part_names[selected_part_index]} removed! Press any button to retrun to {cli_computer.name} options.')
+                            c = click.getchar()
+                            click.echo()
+                            break
+                    else:
+                        os.system('clear')
+                        continue
+    os.system('clear')
+    view_computer_options_cli(cli_computer)
 
 
 
@@ -317,15 +410,19 @@ def add_part_option_cli(cli_computer):
             os.system('clear')
             view_computer_options_cli(cli_computer)
 
-
-def add_part_cpu_cli(cli_computer):
-    valid_cpu_names = [cpu.name for cpu in valid_cpu(cli_computer.id)]
-    add_valid_cpu_options = valid_cpu_names
-    add_valid_cpu_options.extend([
-        f"{GREEN}FILTER",
+#CPU//////////////////////////////////////////////////////////////////////////////
+def add_part_cpu_cli(cli_computer, list=[]):
+    if len(list) is 0:
+        valid_cpu_names = [cpu.name for cpu in valid_cpu(cli_computer.id)]
+    else:
+        valid_cpu_names = list
+    add_valid_cpu_options = [
+        # f"{GREEN}FILTER",
+        f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
         f"{YELLOW}RETURN TO PART OPTIONS"
-    ])
+    ]
+    add_valid_cpu_options.extend(valid_cpu_names)
     # print(valid_cpu_names)
     # print(add_valid_cpu_options)
 
@@ -340,6 +437,10 @@ def add_part_cpu_cli(cli_computer):
     if add_valid_cpu_answer["add_cpu_selector"] == f"{GREEN}FILTER":
         os.system('clear')
         print("FILTER MENU")
+    elif add_valid_cpu_answer["add_cpu_selector"] == f"{CYAN}SORT":
+        os.system('clear')
+        print("SORT MENU")
+        handle_motherboard_sort(cli_computer, valid_cpu_names)
     elif add_valid_cpu_answer["add_cpu_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
@@ -373,17 +474,49 @@ def handle_add_cpu_cli(cli_computer, part_name):
         os.system('clear')
         add_part_cpu_cli(cli_computer)
 
+def handle_cpu_sort(cli_computer, list):
+    handle_cpu_sort_qusetion = [
+            inquirer.List(
+            "cpu_sort",
+            message="FILTER BY:",
+            choices=[
+                "Alphabetical Ascending",
+                "Alphabetical Descending",
+                f"{YELLOW}BACK TO RESULTS"
+            ]
+            )
+        ]
+    handle_cpu_sort_answers = inquirer.prompt(handle_cpu_sort_qusetion)
+    if handle_cpu_sort_answers["cpu_sort"] == "Alphabetical Ascending":
+        sorted_list = sorted(list)
+        os.system('clear')
+        add_part_cpu_cli(cli_computer, sorted_list)
+    elif handle_cpu_sort_answers["cpu_sort"] == "Alphabetical Descending":
+        sorted_list = sorted(list, reverse=True)
+        os.system('clear')
+        add_part_cpu_cli(cli_computer, sorted_list)
+    elif handle_cpu_sort_answers["cpu_sort"] == f"{YELLOW}BACK TO RESULTS":
+        os.system('clear')
+        add_part_cpu_cli(cli_computer, list)
+    else:
+        os.system('clear')
+        add_part_cpu_cli(cli_computer, list)
 
-# def add_part_gpu_cli(cli_computer):
-#     pass
-def add_part_gpu_cli(cli_computer):
-    valid_gpu_names = [gpu.name for gpu in valid_gpu(cli_computer.id)]
-    add_valid_gpu_options = valid_gpu_names
-    add_valid_gpu_options.extend([
-        f"{GREEN}FILTER",
+
+
+#GPU //////////////////////////////////////////////////////////////////////////
+def add_part_gpu_cli(cli_computer, list =[]):
+    if len(list) is 0:
+        valid_gpu_names = [gpu.name for gpu in valid_gpu(cli_computer.id)]
+    else:
+        valid_gpu_names = list
+    add_valid_gpu_options = [
+        # f"{GREEN}FILTER",
+        f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
         f"{YELLOW}RETURN TO PART OPTIONS"
-    ])
+    ]
+    add_valid_gpu_options.extend(valid_gpu_names)
     # print(valid_gpu_names)
     # print(add_valid_gpu_options)
 
@@ -398,6 +531,10 @@ def add_part_gpu_cli(cli_computer):
     if add_valid_gpu_answer["add_gpu_selector"] == f"{GREEN}FILTER":
         os.system('clear')
         print("FILTER MENU")
+    elif add_valid_gpu_answer["add_gpu_selector"] == f"{CYAN}SORT":
+        os.system('clear')
+        print("SORT MENU")
+        handle_motherboard_sort(cli_computer, valid_gpu_names)
     elif add_valid_gpu_answer["add_gpu_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
@@ -431,18 +568,48 @@ def handle_add_gpu_cli(cli_computer, part_name):
         os.system('clear')
         add_part_gpu_cli(cli_computer)
 
+def handle_gpu_sort(cli_computer, list):
+    handle_gpu_sort_qusetion = [
+            inquirer.List(
+            "gpu_sort",
+            message="FILTER BY:",
+            choices=[
+                "Alphabetical Ascending",
+                "Alphabetical Descending",
+                f"{YELLOW}BACK TO RESULTS"
+            ]
+            )
+        ]
+    handle_gpu_sort_answers = inquirer.prompt(handle_gpu_sort_qusetion)
+    if handle_gpu_sort_answers["gpu_sort"] == "Alphabetical Ascending":
+        sorted_list = sorted(list)
+        os.system('clear')
+        add_part_gpu_cli(cli_computer, sorted_list)
+    elif handle_gpu_sort_answers["gpu_sort"] == "Alphabetical Descending":
+        sorted_list = sorted(list, reverse=True)
+        os.system('clear')
+        add_part_gpu_cli(cli_computer, sorted_list)
+    elif handle_gpu_sort_answers["gpu_sort"] == f"{YELLOW}BACK TO RESULTS":
+        os.system('clear')
+        add_part_gpu_cli(cli_computer, list)
+    else:
+        os.system('clear')
+        add_part_gpu_cli(cli_computer, list)
 
 
-# def add_part_motherboard_cli(cli_computer):
-#     pass
-def add_part_motherboard_cli(cli_computer):
-    valid_motherboard_names = [motherboard.name for motherboard in valid_motherboard(cli_computer.id)]
-    add_valid_motherboard_options = valid_motherboard_names
-    add_valid_motherboard_options.extend([
-        f"{GREEN}FILTER",
+# MOTHERBOARD///////////////////////////////////////////////////////
+def add_part_motherboard_cli(cli_computer, list=[]):
+    if len(list) is 0:
+        valid_motherboard_names = [motherboard.name for motherboard in valid_motherboard(cli_computer.id)]
+    else:
+        valid_motherboard_names = list
+    add_valid_motherboard_options = [
+        # f"{GREEN}FILTER",
+        f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
         f"{YELLOW}RETURN TO PART OPTIONS"
-    ])
+    ]
+    add_valid_motherboard_options.extend(valid_motherboard_names)
     # print(valid_motherboard_names)
     # print(add_valid_motherboard_options)
 
@@ -457,6 +624,10 @@ def add_part_motherboard_cli(cli_computer):
     if add_valid_motherboard_answer["add_motherboard_selector"] == f"{GREEN}FILTER":
         os.system('clear')
         print("FILTER MENU")
+    elif add_valid_motherboard_answer["add_motherboard_selector"] == f"{CYAN}SORT":
+        os.system('clear')
+        print("SORT MENU")
+        handle_motherboard_sort(cli_computer, valid_motherboard_names)
     elif add_valid_motherboard_answer["add_motherboard_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
@@ -490,17 +661,47 @@ def handle_add_motherboard_cli(cli_computer, part_name):
         os.system('clear')
         add_part_motherboard_cli(cli_computer)
 
+def handle_motherboard_sort(cli_computer, list):
+    handle_motherboard_sort_qusetion = [
+            inquirer.List(
+            "motherboard_sort",
+            message="FILTER BY:",
+            choices=[
+                "Alphabetical Ascending",
+                "Alphabetical Descending",
+                f"{YELLOW}BACK TO RESULTS"
+            ]
+            )
+        ]
+    handle_motherboard_sort_answers = inquirer.prompt(handle_motherboard_sort_qusetion)
+    if handle_motherboard_sort_answers["motherboard_sort"] == "Alphabetical Ascending":
+        sorted_list = sorted(list)
+        os.system('clear')
+        add_part_motherboard_cli(cli_computer, sorted_list)
+    elif handle_motherboard_sort_answers["motherboard_sort"] == "Alphabetical Descending":
+        sorted_list = sorted(list, reverse=True)
+        os.system('clear')
+        add_part_motherboard_cli(cli_computer, sorted_list)
+    elif handle_motherboard_sort_answers["motherboard_sort"] == f"{YELLOW}BACK TO RESULTS":
+        os.system('clear')
+        add_part_motherboard_cli(cli_computer, list)
+    else:
+        os.system('clear')
+        add_part_motherboard_cli(cli_computer, list)
 
-# def add_part_ram_cli(cli_computer):
-#     pass
-def add_part_ram_cli(cli_computer):
-    valid_ram_names = [ram.name for ram in valid_ram(cli_computer.id)]
-    add_valid_ram_options = valid_ram_names
-    add_valid_ram_options.extend([
-        f"{GREEN}FILTER",
+# RAM ///////////////////////////////////////////////////////////////////
+def add_part_ram_cli(cli_computer, list=[]):
+    if len(list) is 0:
+        valid_ram_names = [ram.name for ram in valid_ram(cli_computer.id)]
+    else:
+        valid_ram_names = list
+    add_valid_ram_options = [
+        # f"{GREEN}FILTER",
+        f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
         f"{YELLOW}RETURN TO PART OPTIONS"
-    ])
+    ]
+    add_valid_ram_options.extend(valid_ram_names)
     # print(valid_ram_names)
     # print(add_valid_ram_options)
 
@@ -515,6 +716,10 @@ def add_part_ram_cli(cli_computer):
     if add_valid_ram_answer["add_ram_selector"] == f"{GREEN}FILTER":
         os.system('clear')
         print("FILTER MENU")
+    elif add_valid_ram_answer["add_ram_selector"] == f"{CYAN}SORT":
+        os.system('clear')
+        print("SORT MENU")
+        handle_ram_sort(cli_computer, valid_ram_names)
     elif add_valid_ram_answer["add_ram_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
@@ -548,16 +753,48 @@ def handle_add_ram_cli(cli_computer, part_name):
         os.system('clear')
         add_part_ram_cli(cli_computer)
 
-# def add_part_storage_cli(cli_computer):
-#     pass
-def add_part_storage_cli(cli_computer):
-    valid_storage_names = [storage.name for storage in valid_storage(cli_computer.id)]
-    add_valid_storage_options = valid_storage_names
-    add_valid_storage_options.extend([
-        f"{GREEN}FILTER",
+def handle_ram_sort(cli_computer, list):
+    handle_ram_sort_qusetion = [
+            inquirer.List(
+            "ram_sort",
+            message="FILTER BY:",
+            choices=[
+                "Alphabetical Ascending",
+                "Alphabetical Descending",
+                f"{YELLOW}BACK TO RESULTS"
+            ]
+            )
+        ]
+    handle_ram_sort_answers = inquirer.prompt(handle_ram_sort_qusetion)
+    if handle_ram_sort_answers["ram_sort"] == "Alphabetical Ascending":
+        sorted_list = sorted(list)
+        os.system('clear')
+        add_part_ram_cli(cli_computer, sorted_list)
+    elif handle_ram_sort_answers["ram_sort"] == "Alphabetical Descending":
+        sorted_list = sorted(list, reverse=True)
+        os.system('clear')
+        add_part_ram_cli(cli_computer, sorted_list)
+    elif handle_ram_sort_answers["ram_sort"] == f"{YELLOW}BACK TO RESULTS":
+        os.system('clear')
+        add_part_ram_cli(cli_computer, list)
+    else:
+        os.system('clear')
+        add_part_ram_cli(cli_computer, list)
+
+
+# STORAGE ////////////////////////////////////////////////////
+def add_part_storage_cli(cli_computer, list=[]):
+    if len(list) is 0:
+        valid_storage_names = [storage.name for storage in valid_storage(cli_computer.id)]
+    else:
+        valid_storage_names = list
+    add_valid_storage_options = [
+        # f"{GREEN}FILTER",
+        f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
         f"{YELLOW}RETURN TO PART OPTIONS"
-    ])
+    ]
+    add_valid_storage_options.extend(valid_storage_names)
     # print(valid_storage_names)
     # print(add_valid_storage_options)
 
@@ -572,6 +809,10 @@ def add_part_storage_cli(cli_computer):
     if add_valid_storage_answer["add_storage_selector"] == f"{GREEN}FILTER":
         os.system('clear')
         print("FILTER MENU")
+    elif add_valid_storage_answer["add_storage_selector"] == f"{CYAN}SORT":
+        os.system('clear')
+        print("SORT MENU")
+        handle_storage_sort(cli_computer, valid_storage_names)
     elif add_valid_storage_answer["add_storage_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
@@ -605,16 +846,49 @@ def handle_add_storage_cli(cli_computer, part_name):
         os.system('clear')
         add_part_storage_cli(cli_computer)
 
-# def add_part_cpu_cooler_cli(cli_computer):
-#     pass
-def add_part_cpu_cooler_cli(cli_computer):
-    valid_cpu_cooler_names = [cpu_cooler.name for cpu_cooler in valid_cpu_cooler(cli_computer.id)]
-    add_valid_cpu_cooler_options = valid_cpu_cooler_names
-    add_valid_cpu_cooler_options.extend([
-        f"{GREEN}FILTER",
+
+def handle_storage_sort(cli_computer, list):
+    handle_storage_sort_qusetion = [
+            inquirer.List(
+            "storage_sort",
+            message="FILTER BY:",
+            choices=[
+                "Alphabetical Ascending",
+                "Alphabetical Descending",
+                f"{YELLOW}BACK TO RESULTS"
+            ]
+            )
+        ]
+    handle_storage_sort_answers = inquirer.prompt(handle_storage_sort_qusetion)
+    if handle_storage_sort_answers["storage_sort"] == "Alphabetical Ascending":
+        sorted_list = sorted(list)
+        os.system('clear')
+        add_part_storage_cli(cli_computer, sorted_list)
+    elif handle_storage_sort_answers["storage_sort"] == "Alphabetical Descending":
+        sorted_list = sorted(list, reverse=True)
+        os.system('clear')
+        add_part_storage_cli(cli_computer, sorted_list)
+    elif handle_storage_sort_answers["storage_sort"] == f"{YELLOW}BACK TO RESULTS":
+        os.system('clear')
+        add_part_storage_cli(cli_computer, list)
+    else:
+        os.system('clear')
+        add_part_storage_cli(cli_computer, list)
+
+
+#CPU COOLER//////////////////////////////////////////
+def add_part_cpu_cooler_cli(cli_computer, list=[]):
+    if len(list) is 0:
+        valid_cpu_cooler_names = [cpu_cooler.name for cpu_cooler in valid_cpu_cooler(cli_computer.id)]
+    else:
+        valid_cpu_cooler_names = list
+    add_valid_cpu_cooler_options = [
+        # f"{GREEN}FILTER",
+        f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
         f"{YELLOW}RETURN TO PART OPTIONS"
-    ])
+    ]
+    add_valid_cpu_cooler_options.extend(valid_cpu_cooler_names)
     # print(valid_cpu_cooler_names)
     # print(add_valid_cpu_cooler_options)
 
@@ -629,6 +903,10 @@ def add_part_cpu_cooler_cli(cli_computer):
     if add_valid_cpu_cooler_answer["add_cpu_cooler_selector"] == f"{GREEN}FILTER":
         os.system('clear')
         print("FILTER MENU")
+    elif add_valid_cpu_cooler_answer["add_cpu_cooler_selector"] == f"{CYAN}SORT":
+        os.system('clear')
+        print("SORT MENU")
+        handle_cpu_cooler_sort(cli_computer, valid_cpu_cooler_names)
     elif add_valid_cpu_cooler_answer["add_cpu_cooler_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
@@ -662,16 +940,49 @@ def handle_add_cpu_cooler_cli(cli_computer, part_name):
         os.system('clear')
         add_part_cpu_cooler_cli(cli_computer)
 
-# def add_part_power_supply_cli(cli_computer):
-#     pass
-def add_part_power_supply_cli(cli_computer):
-    valid_power_supply_names = [power_supply.name for power_supply in valid_power_supply(cli_computer.id)]
-    add_valid_power_supply_options = valid_power_supply_names
-    add_valid_power_supply_options.extend([
-        f"{GREEN}FILTER",
+def handle_cpu_cooler_sort(cli_computer, list):
+    handle_cpu_cooler_sort_qusetion = [
+            inquirer.List(
+            "cpu_cooler_sort",
+            message="FILTER BY:",
+            choices=[
+                "Alphabetical Ascending",
+                "Alphabetical Descending",
+                f"{YELLOW}BACK TO RESULTS"
+            ]
+            )
+        ]
+    handle_cpu_cooler_sort_answers = inquirer.prompt(handle_cpu_cooler_sort_qusetion)
+    if handle_cpu_cooler_sort_answers["cpu_cooler_sort"] == "Alphabetical Ascending":
+        sorted_list = sorted(list)
+        os.system('clear')
+        add_part_cpu_cooler_cli(cli_computer, sorted_list)
+    elif handle_cpu_cooler_sort_answers["cpu_cooler_sort"] == "Alphabetical Descending":
+        sorted_list = sorted(list, reverse=True)
+        os.system('clear')
+        add_part_cpu_cooler_cli(cli_computer, sorted_list)
+    elif handle_cpu_cooler_sort_answers["cpu_cooler_sort"] == f"{YELLOW}BACK TO RESULTS":
+        os.system('clear')
+        add_part_cpu_cooler_cli(cli_computer, list)
+    else:
+        os.system('clear')
+        add_part_cpu_cooler_cli(cli_computer, list)
+
+
+#POWER SUPPLY ADD/////////////////////////////////////////////////////////////////////////////////////
+def add_part_power_supply_cli(cli_computer, list=[]):
+    if len(list) is 0:
+        valid_power_supply_names = [power_supply.name for power_supply in valid_power_supply(cli_computer.id)]
+    else:
+        valid_power_supply_names = list
+    add_valid_power_supply_options = [
+        # f"{GREEN}FILTER",
+        f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
         f"{YELLOW}RETURN TO PART OPTIONS"
-    ])
+    ]
+    valid_power_supply_names
+    add_valid_power_supply_options.extend(valid_power_supply_names)
     # print(valid_power_supply_names)
     # print(add_valid_power_supply_options)
 
@@ -686,6 +997,10 @@ def add_part_power_supply_cli(cli_computer):
     if add_valid_power_supply_answer["add_power_supply_selector"] == f"{GREEN}FILTER":
         os.system('clear')
         print("FILTER MENU")
+    elif add_valid_power_supply_answer["add_power_supply_selector"] == f"{CYAN}SORT":
+        os.system('clear')
+        print("SORT MENU")
+        handle_power_supply_sort(cli_computer, valid_power_supply_names)
     elif add_valid_power_supply_answer["add_power_supply_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
@@ -719,19 +1034,50 @@ def handle_add_power_supply_cli(cli_computer, part_name):
         os.system('clear')
         add_part_power_supply_cli(cli_computer)
 
+def handle_power_supply_sort(cli_computer, list):
+    handle_power_supply_sort_qusetion = [
+            inquirer.List(
+            "power_supply_sort",
+            message="FILTER BY:",
+            choices=[
+                "Alphabetical Ascending",
+                "Alphabetical Descending",
+                f"{YELLOW}BACK TO RESULTS"
+            ]
+            )
+        ]
+    handle_power_supply_sort_answers = inquirer.prompt(handle_power_supply_sort_qusetion)
+    if handle_power_supply_sort_answers["power_supply_sort"] == "Alphabetical Ascending":
+        sorted_list = sorted(list)
+        os.system('clear')
+        add_part_power_supply_cli(cli_computer, sorted_list)
+    elif handle_power_supply_sort_answers["power_supply_sort"] == "Alphabetical Descending":
+        sorted_list = sorted(list, reverse=True)
+        os.system('clear')
+        add_part_power_supply_cli(cli_computer, sorted_list)
+    elif handle_power_supply_sort_answers["power_supply_sort"] == f"{YELLOW}BACK TO RESULTS":
+        os.system('clear')
+        add_part_power_supply_cli(cli_computer, list)
+    else:
+        os.system('clear')
+        add_part_power_supply_cli(cli_computer, list)
 
-# def add_part_case_cli(cli_computer):
-#     pass
-def add_part_case_cli(cli_computer):
-    valid_case_names = [case.name for case in valid_case(cli_computer.id)]
-    add_valid_case_options = valid_case_names
-    add_valid_case_options.extend([
+
+#CASE ADD/////////////////////////////////////////////////////////////////////////////////////
+
+def add_part_case_cli(cli_computer, list=[]):
+    if len(list) is 0:
+        valid_case_names = [case.name for case in valid_case(cli_computer.id)]
+    else:
+        valid_case_names = list
+    add_valid_case_options = [
         f"{GREEN}FILTER",
+        f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
         f"{YELLOW}RETURN TO PART OPTIONS"
-    ])
-    # print(valid_case_names)
-    # print(add_valid_case_options)
+    ]
+    
+    add_valid_case_options.extend(valid_case_names)
 
     add_valid_case_qusetion = [
             inquirer.List(
@@ -745,6 +1091,10 @@ def add_part_case_cli(cli_computer):
         os.system('clear')
         print("FILTER MENU")
         handle_case_filter(cli_computer)
+    elif add_valid_case_answer["add_case_selector"] == f"{CYAN}SORT":
+        os.system('clear')
+        print("SORT MENU")
+        handle_case_sort(cli_computer, valid_case_names)
     elif add_valid_case_answer["add_case_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
@@ -778,6 +1128,33 @@ def handle_add_case_cli(cli_computer, part_name):
         os.system('clear')
         add_part_case_cli(cli_computer)
 
+def handle_case_sort(cli_computer, list):
+    handle_case_sort_qusetion = [
+            inquirer.List(
+            "case_sort",
+            message="FILTER BY:",
+            choices=[
+                "Alphabetical Ascending",
+                "Alphabetical Descending",
+                f"{YELLOW}BACK TO RESULTS"
+            ]
+            )
+        ]
+    handle_case_sort_answers = inquirer.prompt(handle_case_sort_qusetion)
+    if handle_case_sort_answers["case_sort"] == "Alphabetical Ascending":
+        sorted_list = sorted(list)
+        os.system('clear')
+        add_part_case_cli(cli_computer, sorted_list)
+    elif handle_case_sort_answers["case_sort"] == "Alphabetical Descending":
+        sorted_list = sorted(list, reverse=True)
+        os.system('clear')
+        add_part_case_cli(cli_computer, sorted_list)
+    elif handle_case_sort_answers["case_sort"] == f"{YELLOW}BACK TO RESULTS":
+        os.system('clear')
+        add_part_case_cli(cli_computer, list)
+    else:
+        os.system('clear')
+        add_part_case_cli(cli_computer, list)
 
 def handle_case_filter(cli_computer):
     valid_list = valid_case(cli_computer.id)
@@ -790,33 +1167,103 @@ def handle_case_filter(cli_computer):
                 "Color",
                 "Largest Motherboard Form Factor",
                 "Largest Power Supply Form Factor",
-                "Price"
+                "Price",
+                f"{RED}CLEAR FILTERS"
             ]
             )
         ]
     handle_case_filter_answers = inquirer.prompt(handle_case_filter_qusetion)
     new_valid_list = valid_list
-    if "Type" in handle_case_filter_answers["case_filter"]:
-        handle_type_filter_qusetion = [
-            inquirer.Checkbox(
-            "type_filter",
-            message="SELECT THE TYPES",
-            choices=[
-                "ATX Full Tower",
-                "ATX Mid Tower",
-                "MicroATX Mid Tower",
-                "Mini ITX Desktop"
-            ]
-            )
-        ]
-        handle_type_filter_answers = inquirer.prompt(handle_type_filter_qusetion)
-        new_valid_list = new_valid_list.filter(Case.type.in_(handle_type_filter_answers["type_filter"]))
-        print(new_valid_list)
+    if len(handle_case_filter_answers["case_filter"]) == 0:
+        new_valid_list = [case.name for case in valid_list]
     else:
-        print(handle_case_filter_answers["case_filter"])
+        for filter in handle_case_filter_answers["case_filter"]:
+            if filter == "Type":
+                handle_type_filter_qusetion = [
+                    inquirer.Checkbox(
+                    "type_filter",
+                    message="SELECT THE TYPE(S)",
+                    choices=[
+                        "ATX Full Tower",
+                        "ATX Mid Tower",
+                        "MicroATX Mid Tower",
+                        "Mini ITX Desktop"
+                    ]
+                    )
+                ]
+                handle_type_filter_answers = inquirer.prompt(handle_type_filter_qusetion)
+                new_valid_list = [case.name for case in new_valid_list if case.type in handle_type_filter_answers["type_filter"]]
+            elif filter == "Color":
+                handle_color_filter_qusetion = [
+                    inquirer.Checkbox(
+                    "color_filter",
+                    message="SELECT THE COLOR(S)",
+                    choices=[
+                        "Black",
+                        "White",
+                        "Silver",
+                    ]
+                    )
+                ]
+                handle_color_filter_answers = inquirer.prompt(handle_color_filter_qusetion)
+                new_valid_list = [case.name for case in new_valid_list if case.color in handle_color_filter_answers["color_filter"]]
+            elif filter == "Largest Motherboard Form Factor":
+                handle_mff_filter_qusetion = [
+                    inquirer.List(
+                    "mff_filter",
+                    message="SELECT THE LARGEST COMPATABLE MOTHERBOARD FORM FACTOR",
+                    choices=[
+                    'ATX',
+                    'Micro ATX',
+                    'Mini ITX'
+                    ]
+                    )
+                ]
+                handle_mff_filter_answers = inquirer.prompt(handle_mff_filter_qusetion)
+                form_factor_hierarchy = ['Mini ITX', 'Micro ATX', 'ATX']
+                filtered_ffs = form_factor_hierarchy[form_factor_hierarchy.index(handle_mff_filter_answers["mff_filter"]):]
+                new_valid_list = [case.name for case in new_valid_list if case.l_motherboard_ff in filtered_ffs]
+            elif filter == "Largest Power Supply Form Factor":
+                handle_psff_filter_qusetion = [
+                    inquirer.List(
+                    "psff_filter",
+                    message="SELECT THE LARGEST COMPATABLE POWER SUPPLY FORM FACTOR",
+                    choices=[
+                    'ATX',
+                    'SFX'
+                    ]
+                    )
+                ]
+                handle_psff_filter_answers = inquirer.prompt(handle_psff_filter_qusetion)
+                form_factor_hierarchy = ['SFX', 'ATX']
+                filtered_ffs = form_factor_hierarchy[form_factor_hierarchy.index(handle_psff_filter_answers["psff_filter"]):]
+                new_valid_list = [case.name for case in new_valid_list if case.l_ps_ff in filtered_ffs]
+            elif filter == "Price":
+                while True:
+                    try:
+                        handle_price_floor_qusetion = [inquirer.Text("price_floor", message="SELECT THE MINIMUM PRICE",)]
+                        handle_price_floor_answers = inquirer.prompt(handle_price_floor_qusetion)
+                        price_floor = int(handle_price_floor_answers["price_floor"])
 
+                        handle_price_ceiling_qusetion = [inquirer.Text("price_ceiling", message="SELECT THE MAXIMUM PRICE",)]
+                        handle_price_ceiling_answers = inquirer.prompt(handle_price_ceiling_qusetion)
+                        price_ceiling = int(handle_price_ceiling_answers["price_ceiling"])
 
+                        if price_floor > price_ceiling:
+                            print("The minimum price cannot be greater than the maximum price. Please enter valid values.")
+                            continue
 
+                        new_valid_list = [case.name for case in new_valid_list if price_floor < case.price < price_ceiling]
+                        break
+                    except ValueError:
+                        print("Please enter a valid integer for price.")
+            elif filter == f"{RED}CLEAR FILTERS":
+                new_valid_list = [case.name for case in valid_list]
+            else:
+                new_valid_list = [case.name for case in valid_list]
+    os.system("clear")
+    add_part_case_cli(cli_computer, new_valid_list)
+    
 
 
 
@@ -827,22 +1274,3 @@ def handle_case_filter(cli_computer):
 
 if __name__ == '__main__':
     welcome_cli()
-
-
-
-    # click.echo('Welcome! Press any button to continue.', nl=False)
-    # c = click.getchar()
-    # click.echo()
-
-    # questions = [
-    #     inquirer.List(
-    #     "main_menu_selector",
-    #     message="Do you want to",
-    #     choices=["Jumbo", "Large", "Medium", "Small", "Micro"],
-    #     ),
-    #     inquirer.Confirm('continue', message="Ready to Shop!")
-    # ]
-
-    # answers = inquirer.prompt(questions)
-    # print(f"Selected: {answers['main_menu_selector']}\n")
-    # print(f"Excited: {answers['continue']}\n")
