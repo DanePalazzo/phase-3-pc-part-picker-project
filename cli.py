@@ -1,29 +1,25 @@
 from data import *
 from logic import *
+from ascii_text import *
 import inquirer
 import os
 import click
-from rich import print as pprint
 
 from inquirer.themes import GreenPassion
 
-RED = '\033[91m'
-GREEN = '\033[92m'
-YELLOW = '\033[93m'
-CYAN = '\033[96m'
-RESET = '\033[0m'
 
 def welcome_cli():
     os.system('clear')
-    print("COMPUTER PART PICKER")
-    click.echo('Welcome! Press any button to continue.', nl=False)
+    print(title_pc_part_picker)
+    print(title_welcome)
+    click.echo(f'{YELLOW}Press any button to continue.', nl=False)
     c = click.getchar()
     click.echo()
     os.system('clear')
     main_menu_cli()
 
 def main_menu_cli():
-    print("MAIN MENU\n")
+    print(f"{title_main_menu}\n")
     mm_questions = [
         inquirer.List(
         "main_menu_selector",
@@ -40,7 +36,7 @@ def main_menu_cli():
         view_computer_cli()
 
 def create_computer_cli():
-    print("CREATE COMPUTER\n")
+    print(f"{title_create_computer}\n")
     create_computer_questions = [
     inquirer.Text(name="new_pc_name", message="Type the name of the new computer or 'MAIN MENU' to return to the main menu")
     ]
@@ -84,7 +80,7 @@ def create_computer_cli():
 
 
 def view_computer_cli():
-    print("YOUR COMPUTERS\n")
+    print(f"{title_your_computers}\n")
     with Session(engine) as session:
         computers = session.query(Computer).all()
         computer_names = [computer.name for computer in computers]
@@ -107,6 +103,7 @@ def view_computer_cli():
         view_computer_options_cli(cli_computer)
 
 def view_computer_options_cli(cli_computer):
+    print(f"{title_options}\n")
     print(f"{cli_computer.name.upper()} OPTIONS")
     view_computer_options_questions = [
         inquirer.List(
@@ -146,6 +143,7 @@ def delete_computer_cli(cli_computer):
         view_computer_cli()
 
 def view_computer_details_cli(cli_computer):
+    print(f"{title_view_parts}\n")
     print(f'VIEWING {cli_computer.name.upper()} PARTS')
     with Session(engine) as session:
         c_computer = session.query(Computer).filter_by(id=cli_computer.id).first()
@@ -330,6 +328,7 @@ def remove_part_cli(cli_computer, c_computer_part_names):
 
 
 def add_part_option_cli(cli_computer):
+    print(f"{title_add_parts_menu}\n")
     print(f'ADDING PARTS TO: {cli_computer.name.upper()}')
     with Session(engine) as session:
         c_computer = session.query(Computer).filter_by(id=cli_computer.id).first()
@@ -412,6 +411,7 @@ def add_part_option_cli(cli_computer):
 
 #CPU//////////////////////////////////////////////////////////////////////////////
 def add_part_cpu_cli(cli_computer, list=[]):
+    print(f"{tile_add_cpu}")
     if len(list) is 0:
         valid_cpu_names = [cpu.name for cpu in valid_cpu(cli_computer.id)]
     else:
@@ -420,7 +420,7 @@ def add_part_cpu_cli(cli_computer, list=[]):
         # f"{GREEN}FILTER",
         f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
-        f"{YELLOW}RETURN TO PART OPTIONS"
+        f"{YELLOW}RETURN TO ADD PART MENU"
     ]
     add_valid_cpu_options.extend(valid_cpu_names)
     # print(valid_cpu_names)
@@ -444,7 +444,7 @@ def add_part_cpu_cli(cli_computer, list=[]):
     elif add_valid_cpu_answer["add_cpu_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
-    elif add_valid_cpu_answer["add_cpu_selector"] == f"{YELLOW}RETURN TO PART OPTIONS":
+    elif add_valid_cpu_answer["add_cpu_selector"] == f"{YELLOW}RETURN TO ADD PART MENU":
         os.system('clear')
         add_part_option_cli(cli_computer)
     else:
@@ -506,6 +506,7 @@ def handle_cpu_sort(cli_computer, list):
 
 #GPU //////////////////////////////////////////////////////////////////////////
 def add_part_gpu_cli(cli_computer, list =[]):
+    print(f"{title_add_gpu}")
     if len(list) is 0:
         valid_gpu_names = [gpu.name for gpu in valid_gpu(cli_computer.id)]
     else:
@@ -514,7 +515,7 @@ def add_part_gpu_cli(cli_computer, list =[]):
         # f"{GREEN}FILTER",
         f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
-        f"{YELLOW}RETURN TO PART OPTIONS"
+        f"{YELLOW}RETURN TO ADD PART MENU"
     ]
     add_valid_gpu_options.extend(valid_gpu_names)
     # print(valid_gpu_names)
@@ -538,7 +539,7 @@ def add_part_gpu_cli(cli_computer, list =[]):
     elif add_valid_gpu_answer["add_gpu_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
-    elif add_valid_gpu_answer["add_gpu_selector"] == f"{YELLOW}RETURN TO PART OPTIONS":
+    elif add_valid_gpu_answer["add_gpu_selector"] == f"{YELLOW}RETURN TO ADD PART MENU":
         os.system('clear')
         add_part_option_cli(cli_computer)
     else:
@@ -599,6 +600,7 @@ def handle_gpu_sort(cli_computer, list):
 
 # MOTHERBOARD///////////////////////////////////////////////////////
 def add_part_motherboard_cli(cli_computer, list=[]):
+    print(f"{title_add_motherboard}")
     if len(list) is 0:
         valid_motherboard_names = [motherboard.name for motherboard in valid_motherboard(cli_computer.id)]
     else:
@@ -607,7 +609,7 @@ def add_part_motherboard_cli(cli_computer, list=[]):
         # f"{GREEN}FILTER",
         f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
-        f"{YELLOW}RETURN TO PART OPTIONS"
+        f"{YELLOW}RETURN TO ADD PART MENU"
     ]
     add_valid_motherboard_options.extend(valid_motherboard_names)
     # print(valid_motherboard_names)
@@ -631,7 +633,7 @@ def add_part_motherboard_cli(cli_computer, list=[]):
     elif add_valid_motherboard_answer["add_motherboard_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
-    elif add_valid_motherboard_answer["add_motherboard_selector"] == f"{YELLOW}RETURN TO PART OPTIONS":
+    elif add_valid_motherboard_answer["add_motherboard_selector"] == f"{YELLOW}RETURN TO ADD PART MENU":
         os.system('clear')
         add_part_option_cli(cli_computer)
     else:
@@ -691,6 +693,7 @@ def handle_motherboard_sort(cli_computer, list):
 
 # RAM ///////////////////////////////////////////////////////////////////
 def add_part_ram_cli(cli_computer, list=[]):
+    print(f"{title_add_ram}")
     if len(list) is 0:
         valid_ram_names = [ram.name for ram in valid_ram(cli_computer.id)]
     else:
@@ -699,7 +702,7 @@ def add_part_ram_cli(cli_computer, list=[]):
         # f"{GREEN}FILTER",
         f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
-        f"{YELLOW}RETURN TO PART OPTIONS"
+        f"{YELLOW}RETURN TO ADD PART MENU"
     ]
     add_valid_ram_options.extend(valid_ram_names)
     # print(valid_ram_names)
@@ -723,7 +726,7 @@ def add_part_ram_cli(cli_computer, list=[]):
     elif add_valid_ram_answer["add_ram_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
-    elif add_valid_ram_answer["add_ram_selector"] == f"{YELLOW}RETURN TO PART OPTIONS":
+    elif add_valid_ram_answer["add_ram_selector"] == f"{YELLOW}RETURN TO ADD PART MENU":
         os.system('clear')
         add_part_option_cli(cli_computer)
     else:
@@ -784,6 +787,7 @@ def handle_ram_sort(cli_computer, list):
 
 # STORAGE ////////////////////////////////////////////////////
 def add_part_storage_cli(cli_computer, list=[]):
+    print(f"{title_add_storage}")
     if len(list) is 0:
         valid_storage_names = [storage.name for storage in valid_storage(cli_computer.id)]
     else:
@@ -792,7 +796,7 @@ def add_part_storage_cli(cli_computer, list=[]):
         # f"{GREEN}FILTER",
         f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
-        f"{YELLOW}RETURN TO PART OPTIONS"
+        f"{YELLOW}RETURN TO ADD PART MENU"
     ]
     add_valid_storage_options.extend(valid_storage_names)
     # print(valid_storage_names)
@@ -816,7 +820,7 @@ def add_part_storage_cli(cli_computer, list=[]):
     elif add_valid_storage_answer["add_storage_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
-    elif add_valid_storage_answer["add_storage_selector"] == f"{YELLOW}RETURN TO PART OPTIONS":
+    elif add_valid_storage_answer["add_storage_selector"] == f"{YELLOW}RETURN TO ADD PART MENU":
         os.system('clear')
         add_part_option_cli(cli_computer)
     else:
@@ -878,6 +882,7 @@ def handle_storage_sort(cli_computer, list):
 
 #CPU COOLER//////////////////////////////////////////
 def add_part_cpu_cooler_cli(cli_computer, list=[]):
+    print(f"{title_add_cpu_cooler}")
     if len(list) is 0:
         valid_cpu_cooler_names = [cpu_cooler.name for cpu_cooler in valid_cpu_cooler(cli_computer.id)]
     else:
@@ -886,7 +891,7 @@ def add_part_cpu_cooler_cli(cli_computer, list=[]):
         # f"{GREEN}FILTER",
         f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
-        f"{YELLOW}RETURN TO PART OPTIONS"
+        f"{YELLOW}RETURN TO ADD PART MENU"
     ]
     add_valid_cpu_cooler_options.extend(valid_cpu_cooler_names)
     # print(valid_cpu_cooler_names)
@@ -910,7 +915,7 @@ def add_part_cpu_cooler_cli(cli_computer, list=[]):
     elif add_valid_cpu_cooler_answer["add_cpu_cooler_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
-    elif add_valid_cpu_cooler_answer["add_cpu_cooler_selector"] == f"{YELLOW}RETURN TO PART OPTIONS":
+    elif add_valid_cpu_cooler_answer["add_cpu_cooler_selector"] == f"{YELLOW}RETURN TO ADD PART MENU":
         os.system('clear')
         add_part_option_cli(cli_computer)
     else:
@@ -971,6 +976,7 @@ def handle_cpu_cooler_sort(cli_computer, list):
 
 #POWER SUPPLY ADD/////////////////////////////////////////////////////////////////////////////////////
 def add_part_power_supply_cli(cli_computer, list=[]):
+    print(f"{title_add_power_supply}")
     if len(list) is 0:
         valid_power_supply_names = [power_supply.name for power_supply in valid_power_supply(cli_computer.id)]
     else:
@@ -979,7 +985,7 @@ def add_part_power_supply_cli(cli_computer, list=[]):
         # f"{GREEN}FILTER",
         f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
-        f"{YELLOW}RETURN TO PART OPTIONS"
+        f"{YELLOW}RETURN TO ADD PART MENU"
     ]
     valid_power_supply_names
     add_valid_power_supply_options.extend(valid_power_supply_names)
@@ -1004,7 +1010,7 @@ def add_part_power_supply_cli(cli_computer, list=[]):
     elif add_valid_power_supply_answer["add_power_supply_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
-    elif add_valid_power_supply_answer["add_power_supply_selector"] == f"{YELLOW}RETURN TO PART OPTIONS":
+    elif add_valid_power_supply_answer["add_power_supply_selector"] == f"{YELLOW}RETURN TO ADD PART MENU":
         os.system('clear')
         add_part_option_cli(cli_computer)
     else:
@@ -1066,6 +1072,7 @@ def handle_power_supply_sort(cli_computer, list):
 #CASE ADD/////////////////////////////////////////////////////////////////////////////////////
 
 def add_part_case_cli(cli_computer, list=[]):
+    print(f"{title_add_case}")
     if len(list) is 0:
         valid_case_names = [case.name for case in valid_case(cli_computer.id)]
     else:
@@ -1074,7 +1081,7 @@ def add_part_case_cli(cli_computer, list=[]):
         f"{GREEN}FILTER",
         f"{CYAN}SORT",
         f"{YELLOW}RETURN TO MAIN MENU",
-        f"{YELLOW}RETURN TO PART OPTIONS"
+        f"{YELLOW}RETURN TO ADD PART MENU"
     ]
     
     add_valid_case_options.extend(valid_case_names)
@@ -1098,7 +1105,7 @@ def add_part_case_cli(cli_computer, list=[]):
     elif add_valid_case_answer["add_case_selector"] == f"{YELLOW}RETURN TO MAIN MENU":
         os.system('clear')
         main_menu_cli()
-    elif add_valid_case_answer["add_case_selector"] == f"{YELLOW}RETURN TO PART OPTIONS":
+    elif add_valid_case_answer["add_case_selector"] == f"{YELLOW}RETURN TO ADD PART MENU":
         os.system('clear')
         add_part_option_cli(cli_computer)
     else:
